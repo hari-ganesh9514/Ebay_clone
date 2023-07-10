@@ -89,4 +89,23 @@ async def create_listing_data(user_id:int,request:Request,title:str=Form(...),pr
     db.commit()
     listing_data =db.query(models.Listings).all()
     return templates.TemplateResponse("active_listings.html",{"request":request,"listings_data":listing_data})
-    
+
+@app.get('/active_listings')
+def welcome(request: Request,db:Session=Depends(get_db)):
+    listings_data = db.query(models.Listings).all()
+    return templates.TemplateResponse("active_listings.html",{"request":request,"listings_data":listings_data})
+
+@app.get('/categories')
+def welcome(request:Request,db:Session=Depends(get_db)):
+    listings_data= db.query(models.Listings).all()
+    print(listings_data)
+    result =[row.__dict__ for row in listings_data]
+    categories={}
+    for product in result:
+        category = product["category"]
+        if category not in categories:
+            categories[category]=[]
+        categories[category].append(product)
+    print(categories)
+  # return {"category":categories}
+    return templates.TemplateResponse("categories.html",{"request":request,"categories":categories})
